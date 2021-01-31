@@ -1,9 +1,9 @@
-<?php 
+<?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$BASE_URL = "http://localhost:8888/";
+const BASE_URL = "http://localhost/";
 
 function get_url($path = "") {
     echo BASE_URL . $path;
@@ -14,10 +14,10 @@ $sid = "000";
 session_start();
 $page_name = 'access_denied';
 
-if(isset($_SESSION['username'], $_SESSION['password']) && 
-    $_SESSION['username'] === 'kushnarenko' && 
+if (isset($_SESSION['username'], $_SESSION['password']) &&
+    $_SESSION['username'] === 'kushnarenko' &&
     $_SESSION['password'] === '123'
-){
+) {
     if (isset($_GET['page'])) {
         if ($_GET['page'] === "logout") {
             include "../bootcamp_app/actions/logout.php";

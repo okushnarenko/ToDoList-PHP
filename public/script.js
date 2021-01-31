@@ -1,4 +1,5 @@
 /** @format */
+'use strict';
 
 const TaskList = function (container, callback) {
   this.template = document.querySelector(".template");
@@ -35,7 +36,10 @@ const TaskList = function (container, callback) {
     task.querySelector(".edit").addEventListener("click", startEdit.bind(task));
     task
       .querySelector(".save")
-      .addEventListener("click", saveChanges.bind(task));
+      .addEventListener("click", saveChanges.bind({
+        element: task,
+        tasks_object: this.tasks,
+      }));
     //window.addEventListener("click", toggleOptions.bind(false));
     task.classList.remove("template");
     if (status) {
@@ -53,7 +57,8 @@ const TaskList = function (container, callback) {
       this.element.classList.toggle("done");
 
       let order = this.element.getAttribute("data-order");
-      this.tasks_object[order].status = this.element.classList.contains("done");
+      let status = this.element.classList.contains("done");
+      this.tasks_object[order].status = status ? 1 : "";
 
       callback(this.tasks_object);
     }
@@ -97,24 +102,32 @@ const TaskList = function (container, callback) {
 
   const saveChanges = function (event) {
     event.stopPropagation();
-    this.classList.remove("editable");
-    if (this.querySelector("pre").textContent === "") {
-      this.remove();
+    let order = this.element.getAttribute("data-order");
+    this.tasks_object[order].text = this.element.querySelector('pre').textContent;
+
+    this.element.classList.remove("editable");
+    if (this.element.querySelector("pre").textContent === "") {
+      this.element.remove();
     }
-    this.querySelector("pre").removeAttribute("contenteditable");
+    this.element.querySelector("pre").removeAttribute("contenteditable");
+    callback(this.tasks_object)
   };
 };
 
 let todo = new TaskList(".task-list", function (task_list) {
   localStorage.setItem("tasks", JSON.stringify(task_list));
-});
 
-$.ajax({
-  method: 'post',
-  url: action,
-  data: JSON.stringify(task_list)
-}).done(function(msg){
-  console.log(msg);
+  $.ajax({
+    method: 'post',
+    url: action,
+    data: {
+      action: 'update',
+      todos: task_list
+    }
+  }).done(function (msg) {
+      console.log(msg);
+  });
+
 });
 
 document
@@ -123,17 +136,29 @@ document
     event.preventDefault();
     let textarea = this.querySelector("textarea");
     if (textarea.value !== "") {
-      todo.addTask(textarea.value, false);
+      todo.addTask(textarea.value, '');
     }
     textarea.value = "";
   });
 
-let tasks = JSON.parse(localStorage.getItem("tasks"));
 
-if (!tasks) {
-  tasks = {};
-}
+$.ajax({
+  method: 'post',
+  url: action,
+  data: {
+    action: 'get'
+  }
+}).done(function (result) {
 
-for (let i = 0; i < tasks.length; i++) {
-  todo.addTask(tasks[i].text, tasks[i].status);
-}
+  if (result.status === "success") {
+    let tasks = JSON.parse(result.data);
+
+    if (!tasks) {
+      tasks = {};
+    }
+    
+    for (let i = 0; i < tasks.length; i++) {
+      todo.addTask(tasks[i].text, tasks[i].status);
+    }
+  }
+});

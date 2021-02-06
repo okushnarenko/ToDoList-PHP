@@ -5,14 +5,16 @@
 <?php include "../bootcamp_app/components/navigation.php"; ?>
 
 <h1>todo page</h1>
-<a href="?page=logout">logout</a>
+<a href="<?php get_url('?page=logout'); ?>">logout</a>
 
 <form action="" class="new-task">
     <textarea name="task" required></textarea>
     <button type="submit">Izveidot</button>
 </form>
 <div class="task-list">
-    <div class="template">
+    
+</div>
+<div class="template">
         <pre></pre>
         <a href="#" class="option"
             ><svg
@@ -31,7 +33,6 @@
             <a href="#" class="remove">remove</a>
         </div>
     </div>
-</div>
 
 <script>let action = "<?php get_url("?page=request") ?>";</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

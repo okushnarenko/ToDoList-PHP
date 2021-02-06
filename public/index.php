@@ -30,6 +30,9 @@ if (isset($_SESSION['username'], $_SESSION['password']) &&
         }
         elseif ($_GET['page'] === "test_request") {
             $page_name = "test_request";
+        }  
+        elseif ($_GET['page'] === "db_test") {
+            $page_name = "db_test";
         }     
         else {
             $page_name = "page404";
